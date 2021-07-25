@@ -5,9 +5,9 @@
     "version": "0.1",
     "manifest_version": 2,
     "permissions": [
-        "activeTab",
         "declarativeContent",
-        "storage"
+        "storage",
+        "https://app.cryptoblades.io/#/combat/*"
     ],
     "content_scripts": [
         {
