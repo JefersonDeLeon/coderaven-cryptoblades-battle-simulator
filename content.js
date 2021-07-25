@@ -48,7 +48,7 @@ function AttributeNameToElement(attributeName) {
 }
 
 var addListeners = function(){
-    $("body").delegate(".weapon-icon-wrapper", "hover", function() {
+    $("body").delegate(".weapon-icon", "mouseenter", function() {
         var weaponContainer = this;
         var tooltipInnerContainer = document.getElementsByClassName("tooltip-inner");
         if (tooltipInnerContainer.length > 0) {
@@ -79,7 +79,6 @@ var addListeners = function(){
                         value: parseInt(weaponAttributesList[i].children[1].textContent.match(/[0-9]+/)[0])
                     };
                     weapon.weaponAttributes.push(attr);
-                    console.log(attr);
                 }
     
                 // Calculate wepaon total power based on attributes
@@ -87,7 +86,7 @@ var addListeners = function(){
                     var m = 0.0025; // Default weapon bonus multiplier
     
                     if (AttributeNameToElement(weapon.weaponAttributes[i].attrName) == player.element) m = 0.002675;
-                    else if (weaponAttributes[i].attrName == "pwr") m = 0.002575;
+                    else if (weapon.weaponAttributes[i].attrName == "pwr") m = 0.002575;
     
                     weapon.weaponTotalPower += (weapon.weaponAttributes[i].value * m);
                 }
@@ -159,10 +158,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 window.onload = function() {
+    console.log("Crypto Blade Simulator Loaded");
     chrome.storage.sync.get("cb_enabled", function(data) {
         if (data.cb_enabled) {
+            console.log("CB Enabled");
             addListeners();
         } else {
+            console.log("CB Disabled");
             removeListeners();
         }
     });
