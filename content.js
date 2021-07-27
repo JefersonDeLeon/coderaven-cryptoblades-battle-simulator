@@ -47,7 +47,7 @@ function AttributeNameToElement(attributeName) {
     }
 }
 
-var addListeners = function(){
+function AddListeners(){
     $("body").delegate(".weapon-icon", "mouseenter", function() {
         var weaponContainer = this;
         var tooltipInnerContainer = document.getElementsByClassName("tooltip-inner");
@@ -66,14 +66,11 @@ var addListeners = function(){
                 weapon.weaponBonusPower = parseInt(matches[0].replace("Bonus power: ", ""));
             }
 
-            
             var player = {
                 element: document.getElementsByClassName("trait-icon")[0].className.replace(" trait-icon", ""),
                 power: parseInt(document.getElementsByClassName("subtext-stats")[0].children[3].textContent.replace(",", ""))
             };
 
-            var encounters = [];
-            
             // Get all weapon attributes
             var weaponAttributesList = weaponContainer.getElementsByClassName("stats")[0].children;
 
@@ -87,7 +84,7 @@ var addListeners = function(){
                 weapon.weaponAttributes.push(attr);
             }
 
-            // Calculate wepaon total power based on attributes
+            // Calculate weapon total power based on attributes
             for (var i = 0; i < weapon.weaponAttributes.length; i++) {
                 var m = 0.0025; // Default weapon bonus multiplier
 
@@ -116,9 +113,9 @@ var addListeners = function(){
                 var SIMULATION_ROLLS = 100;
                 var wins = 0;
                 for (var r = 0; r < SIMULATION_ROLLS; r++) {
-                    // Add random 0-10% roll bonus
-                    var rollMultiplier = Math.floor(Math.random() * 11);
-                    var rollMultiplierSign = Math.random() < 0.5 ? -1 : 1; // If negative or positive
+                    // Player Roll
+                    var rollMultiplier = Math.floor(Math.random() * 11); // Add random 0-10% roll bonus
+                    var rollMultiplierSign = Math.random() < 0.5 ? -1 : 1; // If roll multiplier bonus is negative or positive
                     var rollPower = weapon.weaponTotalPower * player.power + weapon.weaponBonusPower;
                     var rollHero = (rollPower + (rollPower * rollMultiplier * rollMultiplierSign / 100)) * (1 + traitBonus);
 
@@ -136,28 +133,28 @@ var addListeners = function(){
                 else if (wins < 65) winRateColor = "red";
                 else winRateColor = "orange";
 
-                var victoryProbabilityMessageElement = encounterContainers[i].getElementsByClassName("victory-chance")[0];
-                var winRateElement = victoryProbabilityMessageElement.getElementsByClassName("win-rate");
+                var fightEncounterButton = encounterContainers[i].getElementsByClassName("encounter-button")[0].getElementsByTagName("h1")[0];
+                var winRateElement = fightEncounterButton.getElementsByClassName("win-rate");
                 if (winRateElement && winRateElement.length > 0) {
                     winRateElement[0].outerHTML = `<span class="win-rate" style="color: ${winRateColor}">(${wins}%)<span`;
                 } else {
-                    victoryProbabilityMessageElement.innerHTML = victoryProbabilityMessageElement.innerHTML + ` <span class="win-rate" style="color: ${winRateColor}">(${wins}%)<span>`
+                    fightEncounterButton.innerHTML = fightEncounterButton.innerHTML + ` <span class="win-rate" style="color: ${winRateColor}">(${wins}%)<span>`
                 }
             }
         }
     })
 }
 
-var removeListeners = function(){
+function RemoveListeners(){
     $(".weapon-icon-wrapper").undelegate("hover")
 }
 
 // Message Listener for Background
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.command == "init") {
-        addListeners();
+        AddListeners();
     } else {
-        removeListeners();
+        RemoveListeners();
     }
     sendResponse({result: "success"});
 });
@@ -167,10 +164,10 @@ window.onload = function() {
     chrome.storage.sync.get("cb_enabled", function(data) {
         if (data.cb_enabled) {
             console.log("CB Enabled");
-            addListeners();
+            AddListeners();
         } else {
             console.log("CB Disabled");
-            removeListeners();
+            RemoveListeners();
         }
     });
 }
